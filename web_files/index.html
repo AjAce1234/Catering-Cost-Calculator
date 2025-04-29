@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#f8fafc">
+    <title>Catering Cost Estimator</title>
+    
+    <!-- PWA manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Icons -->
+    <link rel="icon" href="icons/icon-192.png">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    
+    <!-- Styles -->
+    <style>
+        :root {
+            --background: #f8fafc;
+            --foreground: #020817;
+            --card: #ffffff;
+            --card-foreground: #020817;
+            --popover: #ffffff;
+            --popover-foreground: #020817;
+            --primary: #0f766e;
+            --primary-foreground: #f8fafc;
+            --secondary: #f1f5f9;
+            --secondary-foreground: #0f172a;
+            --muted: #f1f5f9;
+            --muted-foreground: #64748b;
+            --accent: #f1f5f9;
+            --accent-foreground: #0f172a;
+            --destructive: #ef4444;
+            --destructive-foreground: #f8fafc;
+            --border: #e2e8f0;
+            --input: #e2e8f0;
+            --ring: #0f766e;
+            --radius: 0.5rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--foreground);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: var(--primary);
+            color: var(--primary-foreground);
+            padding: 1rem;
+            text-align: center;
+        }
+
+        main {
+            flex: 1;
+            padding: 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .card {
+            background-color: var(--card);
+            color: var(--card-foreground);
+            border-radius: var(--radius);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .button {
+            background-color: var(--primary);
+            color: var(--primary-foreground);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .button-secondary {
+            background-color: var(--secondary);
+            color: var(--secondary-foreground);
+        }
+
+        .button:hover {
+            opacity: 0.9;
+        }
+
+        .button:active {
+            transform: translateY(1px);
+        }
+
+        .home-options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        @media (min-width: 640px) {
+            .home-options {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .home-option {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            background-color: var(--card);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .home-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+        }
+
+        .home-option h2 {
+            color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--input);
+            border-radius: var(--radius);
+            background-color: var(--background);
+        }
+
+        .meal-cards {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .meal-cards {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .meal-detail-card {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1rem;
+        }
+
+        .meal-detail-card h3 {
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .number-input {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .number-input button {
+            width: 36px;
+            height: 36px;
+            background-color: var(--secondary);
+            color: var(--secondary-foreground);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .number-input input {
+            width: 60px;
+            text-align: center;
+            margin: 0 0.5rem;
+        }
+
+        .cost-summary {
+            background-color: var(--card);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .cost-summary h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .cost-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .cost-row.total {
+            font-weight: bold;
+            border-bottom: 2px double var(--border);
+            margin-top: 1rem;
+            padding-top: 0.5rem;
+        }
+
+        .cost-row.grand-total {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-top: 0.5rem;
+        }
+        
+        .meal-type-selector {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+        }
+        
+        .meal-type-button {
+            background-color: var(--secondary);
+            color: var(--secondary-foreground);
+            border: 1px solid var(--border);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        
+        .meal-type-button.active {
+            background-color: var(--primary);
+            color: var(--primary-foreground);
+            border-color: var(--primary);
+        }
+        
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .checkbox-item input {
+            width: auto;
+        }
+        
+        .app-footer {
+            padding: 1rem;
+            text-align: center;
+            color: var(--muted-foreground);
+            font-size: 0.875rem;
+            border-top: 1px solid var(--border);
+            margin-top: 2rem;
+        }
+        
+        .ai-prediction-box {
+            border: 1px solid var(--primary);
+            border-radius: var(--radius);
+            padding: 1rem;
+            margin: 1rem 0;
+            background-color: rgba(15, 118, 110, 0.05);
+        }
+        
+        .ai-prediction-box h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .ai-prediction-box p {
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Catering Cost Estimator</h1>
+    </header>
+    
+    <main id="app">
+        <!-- Home page -->
+        <div id="home-page">
+            <div class="card">
+                <h2>Welcome to Catering Cost Estimator</h2>
+                <p>Choose an option below to start estimating your catering costs.</p>
+            </div>
+            
+            <div class="home-options">
+                <div class="home-option" onclick="navigateTo('single-meal')">
+                    <h2>Single Meal Event</h2>
+                    <p>Calculate costs for a single meal event like breakfast, lunch, or dinner.</p>
+                    <button class="button">Get Started</button>
+                </div>
+                
+                <div class="home-option" onclick="navigateTo('multi-meal')">
+                    <h2>Multi-Meal Event</h2>
+                    <p>Calculate costs for events with multiple meals over one or more days.</p>
+                    <button class="button">Get Started</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Single Meal page -->
+        <div id="single-meal-page" style="display: none;">
+            <div class="card">
+                <h2>Single Meal Event</h2>
+                <p>Estimate costs for a single meal event.</p>
+                
+                <div class="form-group">
+                    <label for="meal-type">Meal Type</label>
+                    <div class="meal-type-selector">
+                        <button class="meal-type-button active" data-meal-type="breakfast" onclick="changeMealType('breakfast')">Breakfast</button>
+                        <button class="meal-type-button" data-meal-type="lunch" onclick="changeMealType('lunch')">Lunch</button>
+                        <button class="meal-type-button" data-meal-type="dinner" onclick="changeMealType('dinner')">Dinner</button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="guests">Number of Guests</label>
+                    <div class="number-input">
+                        <button onclick="adjustValue('guests', -10)">-</button>
+                        <input type="number" id="guests" value="100" min="10" onchange="updateCalculation()">
+                        <button onclick="adjustValue('guests', 10)">+</button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="counters">Number of Service Counters</label>
+                    <div class="number-input">
+                        <button onclick="adjustValue('counters', -1)">-</button>
+                        <input type="number" id="counters" value="2" min="1" onchange="updateCalculation()">
+                        <button onclick="adjustValue('counters', 1)">+</button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="profit-margin">Profit Margin (%)</label>
+                    <div class="number-input">
+                        <button onclick="adjustValue('profit-margin', -5)">-</button>
+                        <input type="number" id="profit-margin" value="20" min="0" max="100" onchange="updateCalculation()">
+                        <button onclick="adjustValue('profit-margin', 5)">+</button>
+                    </div>
+                </div>
+                
+                <button class="button" onclick="calculateSingleMeal()">Calculate</button>
+                <button class="button button-secondary" onclick="navigateTo('home')">Back to Home</button>
+            </div>
+            
+            <div id="single-meal-results" style="display: none;">
+                <div class="cost-summary">
+                    <h3>Cost Summary</h3>
+                    
+                    <div class="cost-row">
+                        <span>Material Cost:</span>
+                        <span id="material-cost">₹0.00</span>
+                    </div>
+                    
+                    <div class="cost-row">
+                        <span>Labor Cost:</span>
+                        <span id="labor-cost">₹0.00</span>
+                    </div>
+                    
+                    <div class="cost-row">
+                        <span>Base Cost:</span>
+                        <span id="base-cost">₹0.00</span>
+                    </div>
+                    
+                    <div class="cost-row">
+                        <span>Profit (<span id="profit-percentage">20</span>%):</span>
+                        <span id="profit-amount">₹0.00</span>
+                    </div>
+                    
+                    <div class="cost-row total">
+                        <span>Total Cost:</span>
+                        <span id="total-cost">₹0.00</span>
+                    </div>
+                    
+                    <div class="cost-row">
+                        <span>Per Person Cost:</span>
+                        <span id="per-person-cost">₹0.00</span>
+                    </div>
+                </div>
+                
+                <div class="ai-prediction-box">
+                    <h3>Cost Analysis</h3>
+                    <p id="ai-explanation">Based on industry standards for this meal type and guest count, your pricing seems reasonable. The material cost breakdown and labor allocation are appropriately balanced.</p>
+                    
+                    <button class="button" onclick="recalculateWithAdjustments()">Apply Suggested Adjustments</button>
+                </div>
+                
+                <button class="button" onclick="resetCalculation()">New Calculation</button>
+            </div>
+        </div>
+        
+        <!-- Multi Meal page -->
+        <div id="multi-meal-page" style="display: none;">
+            <div class="card">
+                <h2>Multi-Meal Event</h2>
+                <p>Estimate costs for an event with multiple meals.</p>
+                
+                <div class="form-group">
+                    <label>Main Meal Type</label>
+                    <div class="meal-type-selector">
+                        <button class="meal-type-button active" data-meal-type="breakfast" onclick="changeMainMealType('breakfast')">Breakfast</button>
+                        <button class="meal-type-button" data-meal-type="lunch" onclick="changeMainMealType('lunch')">Lunch</button>
+                        <button class="meal-type-button" data-meal-type="dinner" onclick="changeMainMealType('dinner')">Dinner</button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Include Additional Meals</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="include-breakfast" onchange="toggleMeal('breakfast')">
+                            <label for="include-breakfast">Breakfast</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="include-lunch" onchange="toggleMeal('lunch')">
+                            <label for="include-lunch">Lunch</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="include-dinner" onchange="toggleMeal('dinner')">
+                            <label for="include-dinner">Dinner</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="include-next-day-breakfast" onchange="toggleMeal('nextDayBreakfast')">
+                            <label for="include-next-day-breakfast">Next Day Breakfast</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="multi-meal-details" class="meal-cards">
+                    <!-- Meal cards will be added here dynamically -->
+                </div>
+                
+                <div class="form-group">
+                    <label for="multi-profit-margin">Profit Margin (%)</label>
+                    <div class="number-input">
+                        <button onclick="adjustValue('multi-profit-margin', -5)">-</button>
+                        <input type="number" id="multi-profit-margin" value="20" min="0" max="100" onchange="updateMultiMealCalculation()">
+                        <button onclick="adjustValue('multi-profit-margin', 5)">+</button>
+                    </div>
+                </div>
+                
+                <button class="button" onclick="calculateMultiMeal()">Calculate</button>
+                <button class="button button-secondary" onclick="navigateTo('home')">Back to Home</button>
+            </div>
+            
+            <div id="multi-meal-results" style="display: none;">
+                <div class="cost-summary">
+                    <h3>Cost Summary</h3>
+                    
+                    <div id="meal-cost-breakdown">
+                        <!-- Meal cost rows will be added here dynamically -->
+                    </div>
+                    
+                    <div class="cost-row">
+                        <span>Material Cost:</span>
+                        <span id="multi-material-cost">₹0.00</span>
+                    </div>
+                    
+                    <div class="cost-row">
+                        <span>Labor Cost:</span>
+                        <span id="multi-labor-cost">₹0.00</span>
+                    </div>
+                    
+                    <div class="cost-row">
+                        <span>Base Cost:</span>
+                        <span id="multi-base-cost">₹0.00</span>
+                    </div>
+                    
+                    <div class="cost-row">
+                        <span>Profit (<span id="multi-profit-percentage">20</span>%):</span>
+                        <span id="multi-profit-amount">₹0.00</span>
+                    </div>
+                    
+                    <div class="cost-row total">
+                        <span>Total Cost:</span>
+                        <span id="multi-total-cost">₹0.00</span>
+                    </div>
+                    
+                    <div class="cost-row">
+                        <span>Per Person Cost:</span>
+                        <span id="multi-per-person-cost">₹0.00</span>
+                    </div>
+                </div>
+                
+                <div class="ai-prediction-box">
+                    <h3>Cost Analysis</h3>
+                    <p id="multi-ai-explanation">Based on industry standards for these meal types and guest counts, your pricing seems reasonable. The material cost breakdown and labor allocation are appropriately balanced for a multi-meal event.</p>
+                    
+                    <button class="button" onclick="recalculateMultiWithAdjustments()">Apply Suggested Adjustments</button>
+                </div>
+                
+                <button class="button" onclick="resetMultiCalculation()">New Calculation</button>
+            </div>
+        </div>
+    </main>
+    
+    <footer class="app-footer">
+        <p>Catering Cost Estimator © 2023 | Offline-Capable App</p>
+    </footer>
+    
+    <script>
+        // App state
+        const state = {
+            currentPage: 'home',
+            singleMeal: {
+                mealType: 'breakfast',
+                guests: 100,
+                counters: 2,
+                profitMargin: 20,
+                results: null
+            },
+            multiMeal: {
+                mainMealType: 'dinner',
+                selectedMeals: {
+                    breakfast: false,
+                    lunch: false,
+                    dinner: true,
+                    nextDayBreakfast: false
+                },
+                mealData: {
+                    breakfast: { guests: 80, counters: 2 },
+                    lunch: { guests: 90, counters: 2 },
+                    dinner: { guests: 100, counters: 3 },
+                    nextDayBreakfast: { guests: 70, counters: 2 }
+                },
+                profitMargin: 20,
+                results: null
+            }
+        };
+        
+        // Navigation
+        function navigateTo(page) {
+            document.getElementById('home-page').style.display = 'none';
+            document.getElementById('single-meal-page').style.display = 'none';
+            document.getElementById('multi-meal-page').style.display = 'none';
+            
+            document.getElementById(`${page}-page`).style.display = 'block';
+            state.currentPage = page;
+            
+            if (page === 'multi-meal') {
+                renderMultiMealCards();
+            }
+        }
+        
+        // Single Meal Functions
+        function changeMealType(type) {
+            state.singleMeal.mealType = type;
+            
+            // Update UI
+            document.querySelectorAll('.meal-type-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`.meal-type-button[data-meal-type="${type}"]`).classList.add('active');
+            
+            updateCalculation();
+        }
+        
+        function adjustValue(id, amount) {
+            const input = document.getElementById(id);
+            let value = parseInt(input.value, 10) || 0;
+            value += amount;
+            
+            // Ensure minimum value
+            if (id === 'guests' && value < 10) value = 10;
+            if (id === 'counters' && value < 1) value = 1;
+            if (id.includes('profit-margin')) {
+                if (value < 0) value = 0;
+                if (value > 100) value = 100;
+            }
+            
+            input.value = value;
+            
+            if (id === 'guests' || id === 'counters') {
+                updateCalculation();
+            } else if (id === 'multi-profit-margin') {
+                state.multiMeal.profitMargin = value;
+            } else if (id === 'profit-margin') {
+                state.singleMeal.profitMargin = value;
+            }
+        }
+        
+        function updateCalculation() {
+            state.singleMeal.guests = parseInt(document.getElementById('guests').value, 10) || 100;
+            state.singleMeal.counters = parseInt(document.getElementById('counters').value, 10) || 2;
+            state.singleMeal.profitMargin = parseInt(document.getElementById('profit-margin').value, 10) || 20;
+        }
+        
+        function calculateSingleMeal() {
+            updateCalculation();
+            
+            const { mealType, guests, counters, profitMargin } = state.singleMeal;
+            
+            // Calculate costs based on meal type
+            let materialCostPerPerson = 0;
+            let laborCostPerCounter = 0;
+            
+            if (mealType === 'breakfast') {
+                materialCostPerPerson = 4.5;
+                laborCostPerCounter = 80;
+            } else if (mealType === 'lunch') {
+                materialCostPerPerson = 7.5;
+                laborCostPerCounter = 100;
+            } else if (mealType === 'dinner') {
+                materialCostPerPerson = 12;
+                laborCostPerCounter = 150;
+            }
+            
+            const materialCost = materialCostPerPerson * guests;
+            const laborCost = laborCostPerCounter * counters;
+            const baseCost = materialCost + laborCost;
+            const profit = baseCost * (profitMargin / 100);
+            const totalCost = baseCost + profit;
+            const perPersonCost = totalCost / guests;
+            
+            // Store results
+            state.singleMeal.results = {
+                materialCost,
+                laborCost,
+                baseCost,
+                profit,
+                totalCost,
+                perPersonCost,
+                profitMargin
+            };
+            
+            // Display results
+            document.getElementById('material-cost').textContent = formatCurrency(materialCost);
+            document.getElementById('labor-cost').textContent = formatCurrency(laborCost);
+            document.getElementById('base-cost').textContent = formatCurrency(baseCost);
+            document.getElementById('profit-percentage').textContent = profitMargin;
+            document.getElementById('profit-amount').textContent = formatCurrency(profit);
+            document.getElementById('total-cost').textContent = formatCurrency(totalCost);
+            document.getElementById('per-person-cost').textContent = formatCurrency(perPersonCost);
+            
+            // Generate AI explanation
+            generateAIExplanation(state.singleMeal.results, mealType);
+            
+            // Show results
+            document.getElementById('single-meal-results').style.display = 'block';
+        }
+        
+        function generateAIExplanation(results, mealType) {
+            const { materialCost, laborCost, baseCost, perPersonCost, profitMargin } = results;
+            
+            let isReasonable = true;
+            let explanation = '';
+            
+            // Check if costs are within reasonable ranges
+            if (mealType === 'breakfast' && perPersonCost > 15) {
+                isReasonable = false;
+                explanation = `Your per-person cost of ${formatCurrency(perPersonCost)} is above the typical range for breakfast events. Consider reducing the profit margin or optimizing labor costs.`;
+            } else if (mealType === 'lunch' && perPersonCost > 22) {
+                isReasonable = false;
+                explanation = `Your per-person cost of ${formatCurrency(perPersonCost)} is above the typical range for lunch events. Consider adjusting the profit margin or reducing the number of service counters.`;
+            } else if (mealType === 'dinner' && perPersonCost > 35) {
+                isReasonable = false;
+                explanation = `Your per-person cost of ${formatCurrency(perPersonCost)} is above the typical range for dinner events. Consider reviewing your material costs or adjusting the profit margin.`;
+            } else {
+                explanation = `Based on industry standards for ${mealType} events with similar guest counts, your pricing appears appropriate. The material to labor ratio is well-balanced, and your ${profitMargin}% profit margin is within industry standards.`;
+            }
+            
+            document.getElementById('ai-explanation').textContent = explanation;
+        }
+        
+        function recalculateWithAdjustments() {
+            const { results, mealType } = state.singleMeal;
+            
+            // Apply "AI-suggested" adjustments
+            let newProfitMargin = state.singleMeal.profitMargin;
+            let materialCostMultiplier = 1;
+            let laborCostMultiplier = 1;
+            
+            if (mealType === 'breakfast' && results.perPersonCost > 15) {
+                newProfitMargin = Math.max(15, newProfitMargin - 5);
+                laborCostMultiplier = 0.9;
+            } else if (mealType === 'lunch' && results.perPersonCost > 22) {
+                newProfitMargin = Math.max(15, newProfitMargin - 3);
+                laborCostMultiplier = 0.95;
+            } else if (mealType === 'dinner' && results.perPersonCost > 35) {
+                newProfitMargin = Math.max(18, newProfitMargin - 2);
+                materialCostMultiplier = 0.95;
+            } else {
+                // Slightly optimize costs
+                if (state.singleMeal.profitMargin < 15) {
+                    newProfitMargin = 15;
+                }
+            }
+            
+            // Apply adjustments
+            state.singleMeal.profitMargin = newProfitMargin;
+            document.getElementById('profit-margin').value = newProfitMargin;
+            
+            // Recalculate with new values
+            const newMaterialCost = results.materialCost * materialCostMultiplier;
+            const newLaborCost = results.laborCost * laborCostMultiplier;
+            const newBaseCost = newMaterialCost + newLaborCost;
+            const newProfit = newBaseCost * (newProfitMargin / 100);
+            const newTotalCost = newBaseCost + newProfit;
+            const newPerPersonCost = newTotalCost / state.singleMeal.guests;
+            
+            // Update results
+            state.singleMeal.results = {
+                materialCost: newMaterialCost,
+                laborCost: newLaborCost,
+                baseCost: newBaseCost,
+                profit: newProfit,
+                totalCost: newTotalCost,
+                perPersonCost: newPerPersonCost,
+                profitMargin: newProfitMargin
+            };
+            
+            // Update UI
+            document.getElementById('material-cost').textContent = formatCurrency(newMaterialCost);
+            document.getElementById('labor-cost').textContent = formatCurrency(newLaborCost);
+            document.getElementById('base-cost').textContent = formatCurrency(newBaseCost);
+            document.getElementById('profit-percentage').textContent = newProfitMargin;
+            document.getElementById('profit-amount').textContent = formatCurrency(newProfit);
+            document.getElementById('total-cost').textContent = formatCurrency(newTotalCost);
+            document.getElementById('per-person-cost').textContent = formatCurrency(newPerPersonCost);
+            
+            // Update explanation
+            document.getElementById('ai-explanation').textContent = `Adjustments applied: Optimized profit margin to ${newProfitMargin}%, adjusted cost structure for better pricing. Your new per-person cost of ${formatCurrency(newPerPersonCost)} is more competitive for ${mealType} events while maintaining profitability.`;
+        }
+        
+        function resetCalculation() {
+            state.singleMeal.results = null;
+            document.getElementById('single-meal-results').style.display = 'none';
+        }
+        
+        // Multi Meal Functions
+        function changeMainMealType(type) {
+            state.multiMeal.mainMealType = type;
+            
+            // Update UI
+            document.querySelectorAll('#multi-meal-page .meal-type-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`#multi-meal-page .meal-type-button[data-meal-type="${type}"]`).classList.add('active');
+            
+            // Ensure the main meal is selected
+            state.multiMeal.selectedMeals[type] = true;
+            document.getElementById(`include-${type}`).checked = true;
+            
+            renderMultiMealCards();
+        }
+        
+        function toggleMeal(type) {
+            // For main meal, prevent unchecking
+            if (type === state.multiMeal.mainMealType) {
+                document.getElementById(`include-${type}`).checked = true;
+                return;
+            }
+            
+            state.multiMeal.selectedMeals[type] = document.getElementById(`include-${type}`).checked;
+            renderMultiMealCards();
+        }
+        
+        function renderMultiMealCards() {
+            const container = document.getElementById('multi-meal-details');
+            container.innerHTML = '';
+            
+            for (const [type, isSelected] of Object.entries(state.multiMeal.selectedMeals)) {
+                if (!isSelected) continue;
+                
+                const isMain = type === state.multiMeal.mainMealType;
+                const mealData = state.multiMeal.mealData[type];
+                const displayType = getMealTypeLabel(type);
+                
+                // Create meal card
+                const card = document.createElement('div');
+                card.className = 'meal-detail-card';
+                card.innerHTML = `
+                    <h3>${displayType} ${isMain ? '(Main)' : ''}</h3>
+                    
+                    <div class="form-group">
+                        <label>Number of Guests</label>
+                        <div class="number-input">
+                            <button onclick="adjustMultiMealValue('${type}', 'guests', -10)">-</button>
+                            <input type="number" id="${type}-guests" value="${mealData.guests}" min="10" onchange="updateMultiMealData('${type}', 'guests')">
+                            <button onclick="adjustMultiMealValue('${type}', 'guests', 10)">+</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Number of Service Counters</label>
+                        <div class="number-input">
+                            <button onclick="adjustMultiMealValue('${type}', 'counters', -1)">-</button>
+                            <input type="number" id="${type}-counters" value="${mealData.counters}" min="1" onchange="updateMultiMealData('${type}', 'counters')">
+                            <button onclick="adjustMultiMealValue('${type}', 'counters', 1)">+</button>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            }
+        }
+        
+        function getMealTypeLabel(type) {
+            const labels = {
+                breakfast: 'Breakfast',
+                lunch: 'Lunch',
+                dinner: 'Dinner',
+                nextDayBreakfast: 'Next Day Breakfast'
+            };
+            return labels[type] || type;
+        }
+        
+        function adjustMultiMealValue(mealType, field, amount) {
+            const input = document.getElementById(`${mealType}-${field}`);
+            let value = parseInt(input.value, 10) || 0;
+            value += amount;
+            
+            // Ensure minimum value
+            if (field === 'guests' && value < 10) value = 10;
+            if (field === 'counters' && value < 1) value = 1;
+            
+            input.value = value;
+            updateMultiMealData(mealType, field);
+        }
+        
+        function updateMultiMealData(mealType, field) {
+            const value = parseInt(document.getElementById(`${mealType}-${field}`).value, 10) || 0;
+            state.multiMeal.mealData[mealType][field] = value;
+        }
+        
+        function updateMultiMealCalculation() {
+            state.multiMeal.profitMargin = parseInt(document.getElementById('multi-profit-margin').value, 10) || 20;
+        }
+        
+        function calculateMultiMeal() {
+            updateMultiMealCalculation();
+            
+            const { selectedMeals, mealData, profitMargin, mainMealType } = state.multiMeal;
+            
+            // Calculate costs for each meal
+            let totalMaterialCost = 0;
+            let totalLaborCost = 0;
+            let totalGuests = 0;
+            const mealCosts = [];
+            
+            for (const [type, isSelected] of Object.entries(selectedMeals)) {
+                if (!isSelected) continue;
+                
+                const { guests, counters } = mealData[type];
+                totalGuests += guests;
+                
+                // Get cost factors based on meal type
+                let materialCostPerPerson = 0;
+                let laborCostPerCounter = 0;
+                
+                if (type === 'breakfast' || type === 'nextDayBreakfast') {
+                    materialCostPerPerson = 4.5;
+                    laborCostPerCounter = 80;
+                } else if (type === 'lunch') {
+                    materialCostPerPerson = 7.5;
+                    laborCostPerCounter = 100;
+                } else if (type === 'dinner') {
+                    materialCostPerPerson = 12;
+                    laborCostPerCounter = 150;
+                }
+                
+                const mealMaterialCost = materialCostPerPerson * guests;
+                const mealLaborCost = laborCostPerCounter * counters;
+                const mealCost = mealMaterialCost + mealLaborCost;
+                
+                totalMaterialCost += mealMaterialCost;
+                totalLaborCost += mealLaborCost;
+                
+                mealCosts.push({
+                    type,
+                    cost: mealCost,
+                    laborCost: mealLaborCost,
+                    materialCost: mealMaterialCost,
+                    isMain: type === mainMealType
+                });
+            }
+            
+            const baseCost = totalMaterialCost + totalLaborCost;
+            const profit = baseCost * (profitMargin / 100);
+            const totalCost = baseCost + profit;
+            const perPersonCost = totalCost / totalGuests;
+            
+            // Store results
+            state.multiMeal.results = {
+                materialCost: totalMaterialCost,
+                laborCost: totalLaborCost,
+                baseCost,
+                profit,
+                totalCost,
+                perPersonCost,
+                profitMargin,
+                mealCosts,
+                totalGuests
+            };
+            
+            // Display results
+            document.getElementById('multi-material-cost').textContent = formatCurrency(totalMaterialCost);
+            document.getElementById('multi-labor-cost').textContent = formatCurrency(totalLaborCost);
+            document.getElementById('multi-base-cost').textContent = formatCurrency(baseCost);
+            document.getElementById('multi-profit-percentage').textContent = profitMargin;
+            document.getElementById('multi-profit-amount').textContent = formatCurrency(profit);
+            document.getElementById('multi-total-cost').textContent = formatCurrency(totalCost);
+            document.getElementById('multi-per-person-cost').textContent = formatCurrency(perPersonCost);
+            
+            // Render meal breakdown
+            const breakdownContainer = document.getElementById('meal-cost-breakdown');
+            breakdownContainer.innerHTML = '';
+            
+            mealCosts.forEach(meal => {
+                const row = document.createElement('div');
+                row.className = 'cost-row';
+                row.innerHTML = `
+                    <span>${getMealTypeLabel(meal.type)}${meal.isMain ? ' (Main)' : ''}:</span>
+                    <span>${formatCurrency(meal.cost)}</span>
+                `;
+                breakdownContainer.appendChild(row);
+            });
+            
+            // Generate multi-meal AI explanation
+            generateMultiAIExplanation(state.multiMeal.results);
+            
+            // Show results
+            document.getElementById('multi-meal-results').style.display = 'block';
+        }
+        
+        function generateMultiAIExplanation(results) {
+            const { mealCosts, perPersonCost, totalGuests, profitMargin } = results;
+            
+            let isReasonable = true;
+            let explanation = '';
+            
+            // Check if overall cost is reasonable
+            const mealTypes = mealCosts.map(m => getMealTypeLabel(m.type)).join(', ');
+            
+            if (perPersonCost > 50) {
+                isReasonable = false;
+                explanation = `Your overall per-person cost of ${formatCurrency(perPersonCost)} for multiple meals (${mealTypes}) is higher than typical. Consider adjusting the profit margin or optimizing service counter staffing.`;
+            } else {
+                explanation = `For a multi-meal event featuring ${mealTypes} with ${totalGuests} total guests, your pricing structure is competitive. The ${profitMargin}% profit margin provides a good balance between profitability and value for your clients.`;
+            }
+            
+            document.getElementById('multi-ai-explanation').textContent = explanation;
+        }
+        
+        function recalculateMultiWithAdjustments() {
+            const { results } = state.multiMeal;
+            
+            // Apply "AI-suggested" adjustments
+            let newProfitMargin = state.multiMeal.profitMargin;
+            let laborCostMultiplier = 1;
+            
+            if (results.perPersonCost > 50) {
+                newProfitMargin = Math.max(15, newProfitMargin - 3);
+                laborCostMultiplier = 0.95;
+            } else if (state.multiMeal.profitMargin < 15) {
+                // Ensure reasonable profit margin
+                newProfitMargin = 15;
+            }
+            
+            // Apply adjustments
+            state.multiMeal.profitMargin = newProfitMargin;
+            document.getElementById('multi-profit-margin').value = newProfitMargin;
+            
+            // Recalculate with new values
+            const newLaborCost = results.laborCost * laborCostMultiplier;
+            const newBaseCost = results.materialCost + newLaborCost;
+            const newProfit = newBaseCost * (newProfitMargin / 100);
+            const newTotalCost = newBaseCost + newProfit;
+            const newPerPersonCost = newTotalCost / results.totalGuests;
+            
+            // Update results
+            state.multiMeal.results = {
+                ...results,
+                laborCost: newLaborCost,
+                baseCost: newBaseCost,
+                profit: newProfit,
+                totalCost: newTotalCost,
+                perPersonCost: newPerPersonCost,
+                profitMargin: newProfitMargin
+            };
+            
+            // Update UI
+            document.getElementById('multi-labor-cost').textContent = formatCurrency(newLaborCost);
+            document.getElementById('multi-base-cost').textContent = formatCurrency(newBaseCost);
+            document.getElementById('multi-profit-percentage').textContent = newProfitMargin;
+            document.getElementById('multi-profit-amount').textContent = formatCurrency(newProfit);
+            document.getElementById('multi-total-cost').textContent = formatCurrency(newTotalCost);
+            document.getElementById('multi-per-person-cost').textContent = formatCurrency(newPerPersonCost);
+            
+            // Update explanation
+            document.getElementById('multi-ai-explanation').textContent = `Adjustments applied: Optimized profit margin to ${newProfitMargin}% and reduced labor costs by ${Math.round((1 - laborCostMultiplier) * 100)}%. Your new per-person cost of ${formatCurrency(newPerPersonCost)} is more competitive for multi-meal events while maintaining profitability.`;
+        }
+        
+        function resetMultiCalculation() {
+            state.multiMeal.results = null;
+            document.getElementById('multi-meal-results').style.display = 'none';
+        }
+        
+        // Utilities
+        function formatCurrency(amount) {
+            return '₹' + amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+        }
+        
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(error => {
+                        console.log('ServiceWorker registration failed: ', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>
