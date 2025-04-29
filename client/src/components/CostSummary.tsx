@@ -48,29 +48,29 @@ export default function CostSummary({
 }: CostSummaryProps) {
   const [editingProfit, setEditingProfit] = useState(false);
   const [localProfitMargin, setLocalProfitMargin] = useState(profitMargin);
-  
+
   const handleProfitMarginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value);
     if (!isNaN(value) && value >= 0 && value <= 100) {
       setLocalProfitMargin(value);
     }
   };
-  
+
   const handleProfitMarginSave = () => {
     setEditingProfit(false);
     if (onProfitMarginChange) {
       onProfitMarginChange(localProfitMargin);
     }
   };
-  
+
   // Calculate base costing as Labor Cost + Material Cost
   const baseCosting = laborCost !== undefined && materialCost !== undefined 
     ? laborCost + materialCost 
     : baseCost;
-    
+
   // Calculate total costing range as Base Costing + Miscellaneous Expenses
   const totalCostingRange = baseCosting + miscExpenses;
-  
+
   return (
     <div className="mt-6 bg-white rounded-xl p-6 border border-gray-200 card-shadow">
       {/* 1. Cost Estimate Header */}
@@ -81,7 +81,7 @@ export default function CostSummary({
           </div>
           <h3 className="font-poppins font-bold text-xl">Cost Estimate</h3>
         </div>
-        
+
         {totalGuests > 0 && (
           <div className="text-right">
             <div className="text-sm text-gray-500">Per Person</div>
@@ -89,7 +89,7 @@ export default function CostSummary({
           </div>
         )}
       </div>
-      
+
       <div className="space-y-4">
         {mealCosts.length > 0 && (
           <div className="mb-2">
@@ -127,9 +127,9 @@ export default function CostSummary({
             </div>
           </div>
         )}
-        
+
         {/* === EXACT ORDER AS SPECIFIED === */}
-        
+
         {/* 1. Labor Cost */}
         {laborCost !== undefined && materialCost !== undefined && (
           <div className="flex justify-between items-center py-3 border-b border-gray-100">
@@ -151,7 +151,7 @@ export default function CostSummary({
             <span className="font-semibold text-lg">₹{laborCost.toLocaleString()}</span>
           </div>
         )}
-        
+
         {/* 2. Material Cost */}
         {laborCost !== undefined && materialCost !== undefined && (
           <div className="flex justify-between items-center py-3 border-b border-gray-100">
@@ -173,7 +173,7 @@ export default function CostSummary({
             <span className="font-semibold text-lg">₹{materialCost.toLocaleString()}</span>
           </div>
         )}
-        
+
         {/* 3. Base Costing (Labor + Material) */}
         <div className="flex justify-between items-center py-3 border-b border-gray-100">
           <TooltipProvider>
@@ -193,7 +193,7 @@ export default function CostSummary({
           </TooltipProvider>
           <span className="font-semibold text-lg">₹{baseCosting.toLocaleString()}</span>
         </div>
-        
+
         {/* 4. Miscellaneous Expenses */}
         <div className="flex justify-between items-center py-3 border-b border-gray-100">
           <TooltipProvider>
@@ -218,7 +218,7 @@ export default function CostSummary({
             </div>
           </div>
         </div>
-        
+
         {/* 5. Total Costing Range (Base + Misc) */}
         <div className="flex justify-between items-center py-3 border-b border-gray-100">
           <TooltipProvider>
@@ -247,7 +247,7 @@ export default function CostSummary({
             </div>
           </div>
         </div>
-        
+
         {/* 6. Profit */}
         <div className="flex justify-between items-center py-3 border-b border-gray-100">
           {editingProfit ? (
@@ -290,7 +290,7 @@ export default function CostSummary({
             </>
           )}
         </div>
-        
+
         {/* 7. Grand Total */}
         <div className="flex justify-between items-center p-3 bg-primary/5 rounded-lg mt-2">
           <span className="font-bold text-lg">Grand Total</span>
@@ -306,7 +306,7 @@ export default function CostSummary({
           </div>
         </div>
       </div>
-      
+
       <Button 
         onClick={onNewCalculation}
         className="mt-6 w-full bg-slate-700 hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-xl text-lg h-auto button-shadow hover:translate-y-[-2px] transition-all duration-200"
